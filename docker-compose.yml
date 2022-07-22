@@ -1,0 +1,28 @@
+version: '3.2'
+
+services:
+  todo_db:
+    image: postgres:13.2-alpine
+    container_name: 'todo_db'
+    expose:
+      - "5432"
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - ./postgres/init:/docker-entrypoint-initdb.d
+    
+  todo_app:
+    build: .
+    container_name: 'todo_app'
+    ports:
+      - "5000:5000"
+    working_dir: '/tmp/work'
+    volumes:
+      - ./todo_app:/tmp/work
+    depends_on:
+      - todo_db
+    stdin_open: True
+    tty: True
+

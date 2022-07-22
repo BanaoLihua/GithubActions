@@ -1,0 +1,517 @@
+<html>
+  <head>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="https://use.fontawesome.com/releases/v5.15.4/css/all.css"
+    />
+  </head>
+
+  <body>
+    <section class="vh-100">
+      <div class="container py-5 h-100">
+        <div class="row d-flex justify-content-center align-items-center h-100">
+          <div class="col">
+            <div
+              class="card"
+              id="list1"
+              style="border-radius: 0.75rem; background-color: #eff1f2"
+            >
+              <div class="card-body py-4 px-4 px-md-5">
+                <p class="h1 text-center mt-3 mb-4 pb-3 text-primary">
+                  <i class="fas fa-check-square me-1"></i>
+                  My Todo-s
+                </p>
+
+                <div class="pb-2">
+                  <form action="{{ url_for('create') }}" method="post">
+                    <div class="card">
+                      <div class="card-body">
+                        <div class="d-flex flex-row align-items-center">
+                          <div class="form-group col-7 mx-1">
+                            <input
+                              type="text"
+                              class="form-control form-control-lg"
+                              name="content"
+                              placeholder="Add new..."
+                            />
+                          </div>
+                          <div class="form-group col-2 mx-1">
+                            <input
+                              type="text"
+                              class="form-control form-control-lg"
+                              name="due"
+                              onfocus="this.type='date'"
+                              onfocusout="this.type='text'"
+                              placeholder="Due date"
+                            />
+                          </div>
+                          <div class="form-group col-2 mx-1">
+                            <select class="form-select form-select-lg" aria-label="Default select example" name="type">
+                              <option value="task" selected>Task</option>
+                              <option value="question">Question</option>
+                            </select>
+                          </div>
+                          <div class="form-group col-1 mx-1">
+                            <button type="submit" class="btn btn-primary">
+                              Add
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+
+                <nav>
+                  <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                    <button
+                      class="nav-link active text-dark"
+                      id="nav-profile-tab"
+                      data-bs-toggle="tab"
+                      data-bs-target="#nav-profile"
+                      type="button"
+                      role="tab"
+                      aria-controls="nav-profile"
+                      aria-selected="false"
+                    >
+                      Tasks
+                      <span class="badge bg-danger" id="task_cnt">{{task_cnt}}</span>
+                    </button>
+                    <button
+                      class="nav-link text-dark"
+                      id="nav-contact-tab"
+                      data-bs-toggle="tab"
+                      data-bs-target="#nav-contact"
+                      type="button"
+                      role="tab"
+                      aria-controls="nav-contact"
+                      aria-selected="false"
+                    >
+                      Questions
+                      <span class="badge bg-danger" id="question_cnt">{{question_cnt}}</span>
+                    </button>
+                  </div>
+                </nav>
+                <div class="tab-content" id="nav-tabContent">
+                  <div
+                    class="tab-pane fade show active my-4"
+                    id="nav-profile"
+                    role="tabpanel"
+                    aria-labelledby="nav-profile-tab"
+                  >
+                    {% for task in tasks %}
+                    <ul class="list-group list-group-horizontal rounded-0 mb-3">
+                      <li
+                        class="list-group-item d-flex align-items-center ps-0 pe-3 py-1 rounded-0 border-0 bg-transparent"
+                      >
+                        <form
+                          action="{{ url_for('check') }}"
+                          method="post"
+                          class="form-check"
+                        >
+                          <input type="hidden" value="{{ task.id }}" />
+                          {% if task.iscompleted %}
+                          <input
+                            class="form-check-input me-0"
+                            type="checkbox"
+                            value="task"
+                            id="{{ task.id }}"
+                            aria-label="..."
+                            checked
+                            onchange="strike(this)"
+                          />
+                          {% else %}
+                          <input
+                            class="form-check-input me-0"
+                            type="checkbox"
+                            value="task"
+                            id="{{ task.id }}"
+                            aria-label="..."
+                            onchange="strike(this)"
+                          />
+                          {% endif %}
+                        </form>
+                      </li>
+                      <li
+                        class="list-group-item px-3 py-1 d-flex align-items-center flex-grow-1 border-0 bg-transparent"
+                      >
+                        {% if task.iscompleted %}
+                        <p
+                          class="lead fw-normal mb-0 bg-light w-100 ms-n2 ps-2 py-1 rounded"
+                          id="c_{{ task.id }}"
+                          style="text-decoration-line: line-through"
+                        >
+                          {{ task.content }}
+                        </p>
+                        {% else %}
+                        <p
+                          class="lead fw-normal mb-0 bg-light w-100 ms-n2 ps-2 py-1 rounded"
+                          id="c_{{ task.id }}"
+                        >
+                          {{ task.content }}
+                        </p>
+                        {% endif %}
+                      </li>
+                      <li
+                        class="list-group-item px-3 py-1 d-flex align-items-center border-0 bg-transparent"
+                      >
+                        <div
+                          class="py-2 px-3 me-2 border border-warning rounded-3 d-flex align-items-center bg-light"
+                        >
+                          <p class="small mb-0">
+                            <i
+                              class="fas fa-hourglass-half me-2 text-warning"
+                            ></i>
+                            {{ task.due }}
+                          </p>
+                        </div>
+                      </li>
+                      <li
+                        class="list-group-item ps-3 pe-0 py-1 rounded-0 border-0 bg-transparent"
+                      >
+                        <div class="d-flex flex-row justify-content-end mb-1">
+                          <a
+                            href="#!"
+                            class="text-info"
+                            data-mdb-toggle="tooltip"
+                            title="Edit todo"
+                            data-bs-toggle="modal"
+                            data-bs-target="#modal_{{ task.id }}"
+                            ><i class="fas fa-pencil-alt me-3"></i
+                          ></a>
+                          <form
+                            action="{{ url_for('delete') }}"
+                            name="delete_{{ task.id }}"
+                            method="post"
+                            class="mb-0"
+                          >
+                            <input
+                              type="hidden"
+                              name="id"
+                              value="{{ task.id }}"
+                            />
+                            <input type="hidden" name="type" value="task">
+                            <a
+                              href="javascript:delete_{{ task.id }}.submit()"
+                              class="text-danger"
+                              data-mdb-toggle="tooltip"
+                              title="Delete todo"
+                              ><i class="fas fa-trash-alt"></i
+                            ></a>
+                          </form>
+                        </div>
+                        <div class="text-end text-muted">
+                          <a
+                            href="#!"
+                            class="text-muted"
+                            data-mdb-toggle="tooltip"
+                            title="Created date"
+                          >
+                            <p class="small mb-0">
+                              <i class="fas fa-info-circle me-2"></i>
+                              {{ task.createdat }}
+                            </p>
+                          </a>
+                        </div>
+                      </li>
+                    </ul>
+                    <div
+                      class="modal fade"
+                      id="modal_{{ task.id }}"
+                      tabindex="-1"
+                      aria-labelledby="exampleModalLabel"
+                      aria-hidden="true"
+                    >
+                      <form action="{{ url_for('update')}}" method="post">
+                        <div class="modal-dialog modal-dialog-centered">
+                          <div class="modal-content">
+                            <div class="modal-header">
+                              <h5 class="modal-title" id="exampleModalLabel">
+                                Edit the task
+                              </h5>
+                              <button
+                                type="button"
+                                class="btn-close"
+                                data-bs-dismiss="modal"
+                                aria-label="Close"
+                              ></button>
+                            </div>
+                            <div class="modal-body">
+                              <input
+                                type="hidden"
+                                name="id"
+                                value="{{ task.id }}"
+                              />
+                              <input
+                                type="text"
+                                class="form-control form-control-lg my-1"
+                                name="content"
+                                placeholder="{{ task.content }}"
+                              />
+                              <input
+                                type="date"
+                                class="form-control form-control-lg"
+                                name="due"
+                                value="{{ task.due }}"
+                              />
+                              <input type="hidden" name="type" value="task">
+                            </div>
+                            <div class="modal-footer">
+                              <button
+                                type="button"
+                                class="btn btn-secondary"
+                                data-bs-dismiss="modal"
+                              >
+                                Close
+                              </button>
+                              <button type="submit" class="btn btn-success">
+                                Save changes
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </form>
+                    </div>
+                    {% endfor %}
+                  </div>
+                  <div
+                    class="tab-pane fade my-4"
+                    id="nav-contact"
+                    role="tabpanel"
+                    aria-labelledby="nav-contact-tab"
+                  >
+                    {% for question in questions %}
+                    <ul class="list-group list-group-horizontal rounded-0 mb-3">
+                      <li
+                        class="list-group-item d-flex align-items-center ps-0 pe-3 py-1 rounded-0 border-0 bg-transparent"
+                      >
+                        <form
+                          action="{{ url_for('check') }}"
+                          method="post"
+                          class="form-check"
+                        >
+                          <input type="hidden" value="{{ question.id }}" />
+                          {% if question.iscompleted %}
+                          <input
+                            class="form-check-input me-0"
+                            type="checkbox"
+                            value="question"
+                            id="{{ question.id }}"
+                            aria-label="..."
+                            checked
+                            onchange="strike(this)"
+                          />
+                          {% else %}
+                          <input
+                            class="form-check-input me-0"
+                            type="checkbox"
+                            value="question"
+                            id="{{ question.id }}"
+                            aria-label="..."
+                            onchange="strike(this)"
+                          />
+                          {% endif %}
+                        </form>
+                      </li>
+                      <li
+                        class="list-group-item px-3 py-1 d-flex align-items-center flex-grow-1 border-0 bg-transparent"
+                      >
+                        {% if question.iscompleted %}
+                        <p
+                          class="lead fw-normal mb-0 bg-light w-100 ms-n2 ps-2 py-1 rounded"
+                          id="c_{{ question.id }}"
+                          style="text-decoration-line: line-through"
+                        >
+                          {{ question.content }}
+                        </p>
+                        {% else %}
+                        <p
+                          class="lead fw-normal mb-0 bg-light w-100 ms-n2 ps-2 py-1 rounded"
+                          id="c_{{ question.id }}"
+                        >
+                          {{ question.content }}
+                        </p>
+                        {% endif %}
+                      </li>
+                      <li
+                        class="list-group-item px-3 py-1 d-flex align-items-center border-0 bg-transparent"
+                      >
+                        <div
+                          class="py-2 px-3 me-2 border border-warning rounded-3 d-flex align-items-center bg-light"
+                        >
+                          <p class="small mb-0">
+                            <i
+                              class="fas fa-hourglass-half me-2 text-warning"
+                            ></i>
+                            {{ question.due }}
+                          </p>
+                        </div>
+                      </li>
+                      <li
+                        class="list-group-item ps-3 pe-0 py-1 rounded-0 border-0 bg-transparent"
+                      >
+                        <div class="d-flex flex-row justify-content-end mb-1">
+                          <a
+                            href="#!"
+                            class="text-info"
+                            data-mdb-toggle="tooltip"
+                            title="Edit todo"
+                            data-bs-toggle="modal"
+                            data-bs-target="#modal_{{ question.id }}"
+                            ><i class="fas fa-pencil-alt me-3"></i
+                          ></a>
+                          <form
+                            action="{{ url_for('delete') }}"
+                            name="delete_{{ question.id }}"
+                            method="post"
+                            class="mb-0"
+                          >
+                            <input
+                              type="hidden"
+                              name="id"
+                              value="{{ question.id }}"
+                            />
+                            <input type="hidden" name="type" value="question">
+                            <a
+                              href="javascript:delete_{{ question.id }}.submit()"
+                              class="text-danger"
+                              data-mdb-toggle="tooltip"
+                              title="Delete todo"
+                              ><i class="fas fa-trash-alt"></i
+                            ></a>
+                          </form>
+                        </div>
+                        <div class="text-end text-muted">
+                          <a
+                            href="#!"
+                            class="text-muted"
+                            data-mdb-toggle="tooltip"
+                            title="Created date"
+                          >
+                            <p class="small mb-0">
+                              <i class="fas fa-info-circle me-2"></i>
+                              {{ question.createdat }}
+                            </p>
+                          </a>
+                        </div>
+                      </li>
+                    </ul>
+                    <div
+                      class="modal fade"
+                      id="modal_{{ question.id }}"
+                      tabindex="-1"
+                      aria-labelledby="exampleModalLabel"
+                      aria-hidden="true"
+                    >
+                      <form action="{{ url_for('update')}}" method="post">
+                        <div class="modal-dialog modal-dialog-centered">
+                          <div class="modal-content">
+                            <div class="modal-header">
+                              <h5 class="modal-title" id="exampleModalLabel">
+                                Edit the question
+                              </h5>
+                              <button
+                                type="button"
+                                class="btn-close"
+                                data-bs-dismiss="modal"
+                                aria-label="Close"
+                              ></button>
+                            </div>
+                            <div class="modal-body">
+                              <input
+                                type="hidden"
+                                name="id"
+                                value="{{ question.id }}"
+                              />
+                              <input
+                                type="text"
+                                class="form-control form-control-lg my-1"
+                                name="content"
+                                placeholder="{{ question.content }}"
+                              />
+                              <input
+                                type="date"
+                                class="form-control form-control-lg"
+                                name="due"
+                                value="{{ question.due }}"
+                              />
+                            </div>
+                            <input type="hidden" name="type" value="question">
+                            <div class="modal-footer">
+                              <button
+                                type="button"
+                                class="btn btn-secondary"
+                                data-bs-dismiss="modal"
+                              >
+                                Close
+                              </button>
+                              <button type="submit" class="btn btn-success">
+                                Save changes
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </form>
+                    </div>
+                    {% endfor %}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </body>
+</html>
+
+<style>
+  body {
+    font-family: "Times New Roman", Times, serif;
+  }
+</style>
+
+<script
+  src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+  integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+  crossorigin="anonymous"
+></script>
+
+<script>
+  const strike = (e) => {
+    content = document.getElementById("c_" + e.id);
+    task_cnt = document.getElementById("task_cnt").innerText;
+    question_cnt = document.getElementById("question_cnt").innerText;
+    if (e.checked) {
+      content.style.textDecorationLine = "line-through";
+      if (e.value === "task") {
+        task_cnt --;
+      } else if (e.value === "question") {
+        question_cnt --;
+      }
+    } else {
+      content.style.textDecorationLine = "none";
+      if (e.value === "task") {
+        task_cnt ++;
+      } else if (e.value === "question") {
+        question_cnt ++;
+      }
+    }
+    document.getElementById("task_cnt").innerText = task_cnt;
+    document.getElementById("question_cnt").innerText = question_cnt;
+
+    const form_data = new FormData();
+    form_data.append("id", e.id);
+    form_data.append("iscompleted", e.checked);
+    form_data.append("type", e.value)
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", "{{ url_for('check') }}");
+    xhr.send(form_data);
+  };
+</script>
