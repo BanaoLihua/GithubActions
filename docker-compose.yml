@@ -1,7 +1,7 @@
 version: '3.2'
 
 services:
-  todo_db:
+  db:
     image: postgres:13.2-alpine
     container_name: 'todo_db'
     expose:
@@ -13,7 +13,7 @@ services:
     volumes:
       - ./postgres/init:/docker-entrypoint-initdb.d
     
-  todo_app:
+  web:
     build: .
     container_name: 'todo_app'
     ports:
@@ -22,7 +22,7 @@ services:
     volumes:
       - ./todo_app:/tmp/work
     depends_on:
-      - todo_db
+      - db
     stdin_open: True
     tty: True
 
