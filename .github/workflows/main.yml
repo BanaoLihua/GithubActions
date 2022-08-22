@@ -55,7 +55,7 @@ jobs:
           chmod 600 private_key
 
           # SSH接続して、git pullする
-          ssh -oStrictHostKeyChecking=no ${{ secrets.EC2_USER_NAME }}@${{ secrets.EC2_HOST_NAME }} -i private_key "cd C:\inetpub\test\github-action-sample &&  git pull origin main"
+          ssh -oStrictHostKeyChecking=no ${{ secrets.EC2_USER_NAME }}@${{ secrets.EC2_HOST_NAME }} -i private_key "cd /home/ec2-user/GithubActions &&  git pull origin main"
           echo "good"
 
           # SSHのセキュリティグループを閉じる
