@@ -50,11 +50,11 @@ jobs:
           # SSHのセキュリティグループを開放する
           aws ec2 authorize-security-group-ingress --group-id ${{ secrets.EC2_SECURITY_GROUP_ID }} --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
 
-          # SSH接続して、git pullする
+          # 秘密鍵
           echo "${{ secrets.MY_PRIVATE_KEY }}" > private_key
           chmod 600 private_key
 
-          # 鍵認証の場合はこんな感じ
+          # SSH接続して、git pullする
           ssh -oStrictHostKeyChecking=no ${{ secrets.EC2_USER_NAME }}@${{ secrets.EC2_HOST_NAME }} -i private_key "cd C:\inetpub\test\github-action-sample &&  git pull origin main"
           echo "good"
 
