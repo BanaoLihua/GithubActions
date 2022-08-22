@@ -51,11 +51,11 @@ jobs:
           aws ec2 authorize-security-group-ingress --group-id ${{ secrets.EC2_SECURITY_GROUP_ID }} --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
 
           # 秘密鍵
-          echo "${{ secrets.MY_PRIVATE_KEY }}" > github_key
-          chmod 600 github_key
+          echo "${{ secrets.MY_PRIVATE_KEY }}" > private_key
+          chmod 600 private_key
 
           # SSH接続して、git pullする
-          ssh -oStrictHostKeyChecking=no ${{ secrets.EC2_USER_NAME }}@${{ secrets.EC2_HOST_NAME }} -i github_key "cd C:\inetpub\test\github-action-sample &&  git pull origin main"
+          ssh -oStrictHostKeyChecking=no ${{ secrets.EC2_USER_NAME }}@${{ secrets.EC2_HOST_NAME }} -i private_key "cd C:\inetpub\test\github-action-sample &&  git pull origin main"
           echo "good"
 
           # SSHのセキュリティグループを閉じる
