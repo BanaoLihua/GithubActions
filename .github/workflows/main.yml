@@ -53,6 +53,7 @@ jobs:
           # SSH接続して、git pullする
           echo "${{ secrets.MY_PRIVATE_KEY }}" > private_key
           chmod 600 private_key
+          echo "good"
 
           # 鍵認証の場合はこんな感じ
           ssh -oStrictHostKeyChecking=no ${{ secrets.EC2_USER_NAME }}@${{ secrets.EC2_HOST_NAME }} -i private_key "cd C:\inetpub\test\github-action-sample &&  git pull origin main"
