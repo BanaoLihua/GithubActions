@@ -57,11 +57,6 @@ jobs:
           # 鍵認証の場合はこんな感じ
           ssh -oStrictHostKeyChecking=no ${{ secrets.EC2_USER_NAME }}@${{ secrets.EC2_HOST_NAME }} -i private_key "cd C:\inetpub\test\github-action-sample &&  git pull origin main"
           echo "good"
-          
-          #　パスワード認証の場合はこんな感じ
-          sshpass -p "${{ secrets.ADM_PASS }}" ssh -oStrictHostKeyChecking=no ${{ secrets.EC2_USER_NAME }}@${{ secrets.EC2_HOST_NAME }} "cd C:\inetpub\test\github-action-sample &&  git pull origin main"
-          
-          # pullした後は任意の処理を走らせる
-          
+
           # SSHのセキュリティグループを閉じる
           aws ec2 revoke-security-group-ingress --group-id ${{ secrets.EC2_SECURITY_GROUP_ID }} --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
