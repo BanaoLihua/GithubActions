@@ -6,14 +6,11 @@ on:
       - master
 
 jobs:
-  Test:
-    name: Test
+  Deploy:
+    name: Deploy
     runs-on: ubuntu-latest
 
     steps:
-      - name: echo1
-        run: echo "this is a pen"
-
       # IP取得ライブラリをインストール
       - name: Public IP Install
         id: ip
@@ -28,7 +25,7 @@ jobs:
           cd .github/workflows/
           ls -al
 
-      # AWS CLIをインストールする
+      # AWS CLIをインストール
       - name: AWS CLI install
         run: |
           curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
@@ -36,36 +33,26 @@ jobs:
           sudo ./aws/install --update
           aws --version
 
-      # AWS CLIにキーを設定をする
+      # AWS CLIにキーを設定
       - name: AWS set Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-northeast-1
-      # デプロイする
+      # デプロイ
       - name: Deploy
         run: |
 
-          # SSHのセキュリティグループを開放する
+          # SSHのセキュリティグループを開放
           aws ec2 authorize-security-group-ingress --group-id ${{ secrets.EC2_SECURITY_GROUP_ID }} --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
 
-          # 秘密鍵
+          # 秘密鍵設定
           echo "${{ secrets.MY_PRIVATE_KEY }}" > private_key
           chmod 600 private_key
 
-          # SSH接続して、git pullする
-          ssh -oStrictHostKeyChecking=no ${{ secrets.EC2_USER_NAME }}@${{ secrets.EC2_HOST_NAME }} -i private_key 
-          "
-          DIR="GithubActions"
-          if [ -d $DIR ];
-          then
-            git clone https://github.com/BanaoLihua/GithubActions.git
-            cd GithubActions
-            docker compose up
-          else
-            cd GithubActions
-            git pull origin master
+          # SSH接続して、ソースコードをプル
+          ssh -oStrictHostKeyChecking=no ${{ secrets.EC2_USER_NAME }}@${{ secrets.EC2_HOST_NAME }} -i private_key "cd /home/ec2-user/GithubActions &&  git pull origin master"
 
-          # SSHのセキュリティグループを閉じる
+          # SSHのセキュリティグループを遮断
           aws ec2 revoke-security-group-ingress --group-id ${{ secrets.EC2_SECURITY_GROUP_ID }} --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
